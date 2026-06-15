@@ -1,0 +1,39 @@
+# TEMARIO: DESARROLLO DE APLICACIONES MÓVILES CON REACT NATIVE
+
+1. INTRODUCCIÓN AL DESARROLLO MÓVIL
+   1.1. Conceptos fundamentales: Apps nativas, híbridas y multiplataforma
+   1.2. Comparativa de frameworks: React Native vs. Flutter
+   1.3. Configuración del entorno: Node.js, Visual Studio Code y Expo
+   1.4. Estructura de proyectos y árbol de carpetas escalable
+
+2. COMPONENTES BÁSICOS Y UI
+   2.1. Contenedores y organización: El componente View y Flexbox
+   2.2. Manejo de texto: Componente Text y sus propiedades
+   2.3. Recursos multimedia: Imágenes locales, remotas y dinámicas (Componente Image)
+   2.4. Interacción del usuario: Componente Button y TouchableOpacity
+   2.5. Configuración del sistema: Personalización de la StatusBar
+   2.6. Entradas de datos: TextInput, formularios controlados y tipos de teclado
+   2.7. Contenido desplazable: Uso de ScrollView vertical y horizontal
+
+3. ESTILOS Y DISEÑO AVANZADO
+   3.1. Métodos de estilizado: Inline, StyleSheet y objetos de estilo
+   3.2. Styled Components: CSS-in-JS, componentes reutilizables y encapsulamiento
+   3.3. Tematización (Theming): Uso de ThemeProvider para modos claro y oscuro
+
+4. NAVEGACIÓN
+   4.1. Conceptos de navegación en aplicaciones móviles
+   4.2. Stack Navigation: Configuración de NavigationContainer y Stack.Navigator
+   4.3. Gestión de la pila: Funciones navigation.push y navigation.goBack
+
+5. GESTIÓN DE ESTADO Y PERSISTENCIA DE DATOS
+   5.1. Context API: Compartir estado global y evitar el "prop drilling"
+   5.2. Almacenamiento local (AsyncStorage): Persistencia de sesiones y datos clave-valor
+   5.3. Bases de datos locales (SQLite):
+      5.3.1. Creación de tablas y estructura de datos
+      5.3.2. Operaciones CRUD: Insertar, consultar, actualizar y eliminar registros
+      5.3.3. Implementación de transacciones SQL
+
+6. PRÁCTICA Y PROYECTOS
+   6.1. Creación de perfiles de usuario y tarjetas de producto
+   6.2. Desarrollo de aplicaciones multi-pantalla con diseño Flexbox
+   6.3. Implementación de formularios vinculados a bases de datos SQLite

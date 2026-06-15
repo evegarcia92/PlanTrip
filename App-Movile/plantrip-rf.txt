@@ -1,0 +1,64 @@
+======================================================================
+ESPECIFICACIÓN DE REQUISITOS FUNCIONALES (FRD) - DATOS PRECARGADOS
+SISTEMA: AI-TRIP PLANNER (SISTEMA AUTÓNOMO)
+======================================================================
+
+1. MÓDULO DE INTERFAZ CONVERSACIONAL Y GESTIÓN DE CONTEXTO (RF-01)
+----------------------------------------------------------------------
+* RF-01-01: El sistema debe capturar mediante lenguaje natural los parámetros 
+            obligatorios del usuario: Destino, Presupuesto Máximo, Rango de 
+            Fechas (Mes/Temporada) y Número/Perfil de Acompañantes.
+* RF-01-02: El sistema debe mantener el estado de la sesión para permitir 
+            modificaciones interactivas sobre el itinerario (ej: "Cambiame 
+            las actividades de la tarde").
+* RF-01-03: El sistema debe transformar la respuesta estructurada del LLM 
+            en componentes visuales (tarjetas con la info de hoteles y precios 
+            fijos) en la interfaz de la app.
+
+2. MÓDULO DE CONSULTA SOBRE MATRIZ DE DATOS LOCALES (RF-02)
+----------------------------------------------------------------------
+* RF-02-01: El sistema debe buscar disponibilidad y precios dentro de un 
+            inventario local estático (base de datos relacional o vectorial 
+            interna) de alojamientos, actividades y transportes precargados.
+* RF-02-02: El sistema debe simular la "Disponibilidad en Fecha" cruzando las 
+            fechas ingresadas por el usuario con las reglas de negocio fijas 
+            de las temporadas (Alta, Media, Baja) guardadas en la base de datos.
+
+3. MÓDULO DE LOGÍSTICA DE ARRIBO Y MOVILIDAD INTERNA PRECARGADA (RF-03)
+----------------------------------------------------------------------
+* RF-03-01: El sistema debe calcular el costo de traslado al destino (vuelos/
+            micros) basándose en una matriz fija de precios por tramo según 
+            la temporada y el número total de acompañantes.
+* RF-03-02: El sistema debe extraer las sugerencias de transporte público 
+            (líneas, subtes, pases fijos) y privado (tarifas planas estimadas) 
+            desde la ficha técnica del destino cargada en el sistema.
+
+4. MÓDULO DE SELECCIÓN DE ACTIVIDADES Y ASOCIACIÓN DE AGENCIAS (RF-04)
+----------------------------------------------------------------------
+* RF-04-01: El sistema debe filtrar el catálogo de actividades internas que 
+            coincidan con el destino y el perfil del grupo (ej: niños, adultos).
+* RF-04-02: El sistema debe asociar e indicar el nombre de la agencia proveedora 
+            local (según los datos precargados) que ofrece la actividad, junto 
+            con su tarifa estática.
+
+5. MÓDULO DE REGLAS FINTECH Y SIMULACIÓN DE PROMOCIONES (RF-05)
+----------------------------------------------------------------------
+* RF-05-01: El sistema debe contrastar el costo total del viaje seleccionado 
+            contra el catálogo local de promociones bancarias vigentes 
+            (ej: "Banco X - 3 cuotas fijas").
+* RF-05-02: El chatbot debe inyectar en su respuesta de texto la sugerencia 
+            específica del método de pago precargado que minimice el impacto 
+            en el presupuesto.
+
+6. MÓDULO DE ORQUESTACIÓN PRESUPUESTARIA (RF-06)
+----------------------------------------------------------------------
+* RF-06-01: El sistema debe realizar la sumatoria matemática estricta de 
+            los costos de los ítems seleccionados de la base de datos 
+            (Transporte + Alojamiento + Actividades) multiplicada por la 
+            cantidad de acompañantes.
+* RF-06-02: Si la combinación supera el presupuesto máximo del usuario, el 
+            sistema debe obligar al LLM a pivotar automáticamente hacia 
+            opciones de menor categoría (ej: Hostels en vez de Hoteles) o 
+            sugerir el destino alternativo más económico que exista en la 
+            base de datos.
+======================================================================
