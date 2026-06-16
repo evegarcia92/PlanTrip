@@ -33,3 +33,22 @@ export const Theme = {
     success: '#34C759',
   }
 };
+
+export const Colors = {
+  light: {
+    text: '#333333',
+    background: '#e7e2d0',
+    tint: '#697cb2',
+    icon: '#697cb2',
+    tabIconDefault: '#9ca7cd',
+    tabIconSelected: '#697cb2',
+  },
+  dark: {
+    text: '#ffffff',
+    background: '#333333',
+    tint: '#9ca7cd',
+    icon: '#9ca7cd',
+    tabIconDefault: '#697cb2',
+    tabIconSelected: '#9ca7cd',
+  },
+};
