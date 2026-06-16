@@ -329,7 +329,7 @@ async function ensureDbReady(): Promise<SQLite.SQLiteDatabase> {
         [5, 'Café del Museo', 'Café', 8000, 'WiFi, Aire acondicionado, Terraza', 'Baja'],
         [5, 'Khamra', 'Cocina tailandesa', 22000, 'WiFi, Aire acondicionado, Terraza, Música en vivo', 'Media'],
         [5, 'El Papagayo', 'Cocina fusión', 28000, 'WiFi, Aire acondicionado, Terraza, Bar', 'Alta'],
-        [5, 'Burguer House', 'Hamburguesería', 10000, 'WiFi, Aire acondicionado, Menú infantil', 'Baja'],
+        [5, 'Burger House', 'Hamburguesería', 10000, 'WiFi, Aire acondicionado, Menú infantil', 'Baja'],
         [5, 'La Parrilla de Córdoba', 'Parrilla', 15000, 'WiFi, Aire acondicionado, Estacionamiento, Menú infantil', 'Media'],
         [5, 'Alfonsina', 'Cocina de autor', 30000, 'WiFi, Aire acondicionado, Terraza', 'Alta'],
         [5, 'Mercado Norte', 'Mercado', 5000, 'WiFi, Aire acondicionado', 'Baja'],
@@ -491,7 +491,7 @@ async function ensureDbReady(): Promise<SQLite.SQLiteDatabase> {
         [4, 'San Antonio de los Cobres', 'Adultos', 'Norte Tours', 22000],
         // Córdoba (5)
         [5, 'Manzana Jesuítica', 'Todos', 'Córdoba Tours', 5000],
-        [5, 'Villa Carlos María', 'Todos', 'Sierras Tours', 8000],
+        [5, 'Villa Carlos Paz', 'Todos', 'Sierras Tours', 8000],
         [5, 'Museo Superior de Bellas Artes', 'Adultos', 'Museos Córdoba', 3000],
         [5, 'Cerro Uritorco Trek', 'Adultos', 'Trekking Córdoba', 15000],
         [5, 'Dique Los Molinos', 'Todos', 'Lagos Tours', 8000],
@@ -508,7 +508,7 @@ async function ensureDbReady(): Promise<SQLite.SQLiteDatabase> {
         [6, 'Paseo en Barco bajo las Cataratas', 'Adultos', 'Aventura Iguazú', 35000],
         [6, 'Güirá Oga (Centro de Aves)', 'Todos', 'Güirá Oga', 8000],
         [6, 'Sendero Verde', 'Todos', 'Parques Nacionales', 5000],
-        [6, 'Museo de la Imágen', 'Todos', 'Museos Iguazú', 2000],
+        [6, 'Museo de la Imagen', 'Todos', 'Museos Iguazú', 2000],
         [6, 'Tour a las Ruinas Jesuitas', 'Adultos', 'Historia Tours', 10000],
         [6, 'Comunidad Guaraní', 'Adultos', 'Culturas Iguazú', 8000],
         [6, 'Bici por la Selva', 'Adultos', 'Selva Bike', 12000],
@@ -687,3 +687,686 @@ export const loginUser = async (username: string, password: string) => {
     return { success: false, error: 'Error al iniciar sesión. Verifica que la base de datos esté disponible.' };
   }
 };
+
+/* ── Static data mirror for orchestrator (avoids async DB queries in chat flow) ── */
+
+export type SeasonPrice = { alta: number; media: number; baja: number };
+
+export type Accommodation = {
+  name: string;
+  category: string;
+  pricePerNight: SeasonPrice;
+  amenities: string[];
+};
+
+export type Activity = {
+  name: string;
+  price: number;
+  duration: string;
+  agency: string;
+  tags: string[];
+};
+
+export type Transport = {
+  type: string;
+  carrier: string;
+  from: string;
+  pricePerPerson: SeasonPrice;
+  duration: string;
+};
+
+export type LocalTransport = {
+  type: string;
+  description: string;
+  price: number;
+};
+
+export type Promotion = {
+  bank: string;
+  description: string;
+  discount: string;
+};
+
+export type Destination = {
+  city: string;
+  country: string;
+  description: string;
+  accommodations: Accommodation[];
+  activities: Activity[];
+  transport: Transport[];
+  localTransport?: LocalTransport[];
+  promotions?: Promotion[];
+};
+
+export const DESTINATIONS: Destination[] = [
+  /* ───────── 1. Buenos Aires ───────── */
+  {
+    city: 'Buenos Aires',
+    country: 'Argentina',
+    description: 'Capital del tango, la gastronomía y la cultura. Recorré sus barrios emblemáticos: San Telmo, La Boca, Palermo y Recoleta.',
+    accommodations: [
+      { name: 'Alvear Palace Hotel', category: 'Hotel', pricePerNight: { alta: 280000, media: 224000, baja: 168000 }, amenities: ['WiFi', 'Desayuno incluido', 'Spa', 'Gimnasio', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'NH Collection', category: 'Hotel', pricePerNight: { alta: 118750, media: 95000, baja: 71250 }, amenities: ['WiFi', 'Desayuno incluido', 'Gimnasio', 'Aire acondicionado'] },
+      { name: 'Milhouse Hostel', category: 'Hostel', pricePerNight: { alta: 30600, media: 23400, baja: 18000 }, amenities: ['WiFi', 'Desayuno incluido', 'Bar'] },
+      { name: 'Faena Hotel', category: 'Hotel', pricePerNight: { alta: 350000, media: 280000, baja: 210000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Aparcacoches', 'Restaurante'] },
+      { name: 'Soho Buenos Aires', category: 'Hotel', pricePerNight: { alta: 93750, media: 75000, baja: 56250 }, amenities: ['WiFi', 'Desayuno incluido', 'Pet friendly', 'Aire acondicionado'] },
+      { name: 'Casa Calma', category: 'Hotel', pricePerNight: { alta: 120000, media: 96000, baja: 72000 }, amenities: ['WiFi', 'Spa', 'Desayuno incluido', 'Aire acondicionado', 'Calefacción'] },
+      { name: 'Viajero Hostel', category: 'Hostel', pricePerNight: { alta: 25500, media: 19500, baja: 15000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Actividades'] },
+      { name: 'Ker Recoleta', category: 'Hotel', pricePerNight: { alta: 81250, media: 65000, baja: 48750 }, amenities: ['WiFi', 'Desayuno incluido', 'Gimnasio', 'Estacionamiento'] },
+      { name: 'Four Seasons Buenos Aires', category: 'Hotel', pricePerNight: { alta: 450000, media: 360000, baja: 270000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Pet friendly'] },
+      { name: 'America del Sur Hostel', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Desayuno incluido', 'Bar', 'Terraza'] },
+      { name: 'Hotel Madero', category: 'Hotel', pricePerNight: { alta: 130000, media: 104000, baja: 78000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Bayres Apart', category: 'Apartamento', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Aire acondicionado', 'Cocina', 'Calefacción'] },
+    ],
+    activities: [
+      { name: 'Tour Teatro Colón', price: 15000, duration: '2h', agency: 'BA Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Recorrida por La Boca', price: 8000, duration: '3h', agency: 'BA Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Caminito y Museo Quinquela', price: 6000, duration: '2h', agency: 'Caminito Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Tango Show en San Telmo', price: 22000, duration: '2h', agency: 'Tango Experience', tags: ['Adultos', 'Espectáculo'] },
+      { name: 'Paseo en Tigre (Delta)', price: 12000, duration: '4h', agency: 'Delta Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Jardín Japonés', price: 3000, duration: '1.5h', agency: 'Jardín Japonés', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Parque de la Costa', price: 25000, duration: '5h', agency: 'Tigre Viajes', tags: ['Niños', 'Entretenimiento'] },
+      { name: 'Museo MALBA', price: 5000, duration: '2h', agency: 'MALBA', tags: ['Adultos', 'Cultura'] },
+      { name: 'Tour en Bici por Palermo', price: 4000, duration: '3h', agency: 'Bike BA', tags: ['Adultos', 'Deporte'] },
+      { name: 'Recorrida Puerto Madero', price: 2000, duration: '2h', agency: 'BA Walking', tags: ['Todos', 'Paseo'] },
+      { name: 'Planetario', price: 3000, duration: '1.5h', agency: 'Planetario', tags: ['Niños', 'Educación'] },
+      { name: 'Feria de San Telmo (domingo)', price: 0, duration: '3h', agency: 'Gratuito', tags: ['Todos', 'Cultura'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Aeroparque (AEP)', pricePerPerson: { alta: 0, media: 0, baja: 0 }, duration: '—' },
+      { type: 'Bus', carrier: 'Retiro Terminal', from: 'Terminal Retiro', pricePerPerson: { alta: 0, media: 0, baja: 0 }, duration: '—' },
+    ],
+    localTransport: [
+      { type: 'Subte', description: 'Líneas A/B/C/D/E', price: 370 },
+      { type: 'Colectivo', description: 'Red de colectivos urbanos', price: 370 },
+      { type: 'Taxi/Remis', description: 'Tarifa por km', price: 15000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 2. Bariloche ───────── */
+  {
+    city: 'Bariloche',
+    country: 'Argentina',
+    description: 'La Suiza argentina: lagos cristalinos, montañas nevadas, chocolate artesanal y deportes de invierno en Cerro Catedral.',
+    accommodations: [
+      { name: 'Llao Llao Resort', category: 'Hotel', pricePerNight: { alta: 450000, media: 360000, baja: 270000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Vista al lago', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hotel Nahuel Huapi', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Desayuno incluido', 'Vista al lago', 'Calefacción'] },
+      { name: 'Cabañas del Lago', category: 'Cabaña', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Vista al lago', 'Calefacción', 'Pet friendly'] },
+      { name: 'Hostel 41 Below', category: 'Hostel', pricePerNight: { alta: 27200, media: 20800, baja: 16000 }, amenities: ['WiFi', 'Bar', 'Desayuno incluido', 'Calefacción'] },
+      { name: 'Sol del Nahuel', category: 'Hotel', pricePerNight: { alta: 87500, media: 70000, baja: 52500 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Calefacción'] },
+      { name: 'Cabañas Chimpay', category: 'Cabaña', pricePerNight: { alta: 68000, media: 52000, baja: 40000 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Pet friendly', 'Calefacción'] },
+      { name: 'Hotel Panamericano', category: 'Hotel', pricePerNight: { alta: 110000, media: 88000, baja: 66000 }, amenities: ['WiFi', 'Desayuno incluido', 'Gimnasio', 'Piscina', 'Estacionamiento'] },
+      { name: 'Huinid Hotel', category: 'Hotel', pricePerNight: { alta: 106250, media: 85000, baja: 63750 }, amenities: ['WiFi', 'Desayuno incluido', 'Spa', 'Estacionamiento', 'Calefacción'] },
+      { name: 'Paso de los Andes', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Cocina', 'Bar', 'Calefacción'] },
+      { name: 'Arelauquen Lodge', category: 'Cabaña', pricePerNight: { alta: 120000, media: 96000, baja: 72000 }, amenities: ['WiFi', 'Piscina', 'Estacionamiento', 'Vista a la montaña', 'Calefacción'] },
+      { name: 'Tango Hostel', category: 'Hostel', pricePerNight: { alta: 16250, media: 13000, baja: 9750 }, amenities: ['WiFi', 'Desayuno incluido', 'Bar', 'Terraza'] },
+      { name: 'Hotel Edelweiss', category: 'Hotel', pricePerNight: { alta: 75000, media: 60000, baja: 45000 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Estacionamiento'] },
+    ],
+    activities: [
+      { name: 'Cerro Catedral Ski', price: 85000, duration: '6h', agency: 'SnowTravel', tags: ['Adultos', 'Deporte', 'Invierno'] },
+      { name: 'Paseo en Barco Lago Nahuel Huapi', price: 35000, duration: '3h', agency: 'LakeTours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Circuito Chico', price: 12000, duration: '4h', agency: 'Bariloche Tours', tags: ['Todos', 'Paseo'] },
+      { name: 'Colonia Suiza', price: 8000, duration: '3h', agency: 'Bariloche Tours', tags: ['Todos', 'Gastronomía'] },
+      { name: 'Cerro Otto Teleférico', price: 15000, duration: '2h', agency: 'Cerro Otto', tags: ['Todos', 'Paisaje'] },
+      { name: 'Museo del Chocolate', price: 5000, duration: '1.5h', agency: 'Fenoglio', tags: ['Niños', 'Gastronomía'] },
+      { name: 'Rafting Río Manso', price: 25000, duration: '3h', agency: 'Aventura Sur', tags: ['Adultos', 'Aventura'] },
+      { name: 'Cabalgata Cerro López', price: 22000, duration: '4h', agency: 'Andes Ride', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Isla Victoria', price: 28000, duration: '5h', agency: 'LakeTours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Parque Nacional Arrayanes', price: 20000, duration: '4h', agency: 'LakeTours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Bici de Montaña', price: 15000, duration: '4h', agency: 'MTB Bariloche', tags: ['Adultos', 'Deporte'] },
+      { name: 'Pesca Deportiva', price: 18000, duration: '5h', agency: 'Pesca Sur', tags: ['Adultos', 'Deporte'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 120000, media: 85000, baja: 55000 }, duration: '2h 15min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 80000, media: 55000, baja: 35000 }, duration: '2h 15min' },
+      { type: 'Bus', carrier: 'Vía Bariloche', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 65000, media: 50000, baja: 35000 }, duration: '22h' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Líneas 20/50', price: 2500 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 2500 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 25000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 3. Mendoza ───────── */
+  {
+    city: 'Mendoza',
+    country: 'Argentina',
+    description: 'Tierra del Malbec, la ruta del vino, el Aconcagua y aventura en la cordillera. Sol, bodegas y paisajes inolvidables.',
+    accommodations: [
+      { name: 'Park Hyatt Mendoza', category: 'Hotel', pricePerNight: { alta: 380000, media: 304000, baja: 228000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Diplomatic Hotel', category: 'Hotel', pricePerNight: { alta: 110000, media: 88000, baja: 66000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Aire acondicionado'] },
+      { name: 'Mendoza Backpackers', category: 'Hostel', pricePerNight: { alta: 25500, media: 19500, baja: 15000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Piscina'] },
+      { name: 'Entre Cielos Hotel', category: 'Hotel', pricePerNight: { alta: 250000, media: 200000, baja: 150000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Vista a la montaña', 'Desayuno incluido', 'Estacionamiento'] },
+      { name: 'Hotel Roque', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Estacionamiento'] },
+      { name: 'Casa Provincial', category: 'Hotel', pricePerNight: { alta: 106250, media: 85000, baja: 63750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Aire acondicionado'] },
+      { name: 'Hostel Lao', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Piscina'] },
+      { name: 'Posada de Rosas', category: 'Hotel', pricePerNight: { alta: 81250, media: 65000, baja: 48750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Sheraton Mendoza', category: 'Hotel', pricePerNight: { alta: 180000, media: 144000, baja: 108000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hotel Intercontinental', category: 'Hotel', pricePerNight: { alta: 140000, media: 112000, baja: 84000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Alas Argentinas', category: 'Hostel', pricePerNight: { alta: 13600, media: 10400, baja: 8000 }, amenities: ['WiFi', 'Cocina', 'Terraza'] },
+      { name: 'Cabañas Suizas', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+    ],
+    activities: [
+      { name: 'Ruta del Vino', price: 45000, duration: '6h', agency: 'Mendoza Vinos', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'Rafting Río Mendoza', price: 20000, duration: '3h', agency: 'Aventura Mendoza', tags: ['Adultos', 'Aventura'] },
+      { name: 'Cerro Aconcagua Trek', price: 35000, duration: '8h', agency: 'Andes Trek', tags: ['Adultos', 'Trekking'] },
+      { name: 'City Tour Mendoza', price: 8000, duration: '3h', agency: 'Mendoza Tours', tags: ['Todos', 'Cultura'] },
+      { name: 'Parque General San Martín', price: 2000, duration: '2h', agency: 'Parques Mendoza', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Enoturismo Valle de Uco', price: 55000, duration: '8h', agency: 'Valle Tours', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'Paseo en Globo', price: 40000, duration: '1.5h', agency: 'Globos Mendoza', tags: ['Adultos', 'Aventura'] },
+      { name: 'Museo del Vino', price: 5000, duration: '2h', agency: 'Museos Mendoza', tags: ['Adultos', 'Cultura'] },
+      { name: 'Termas de Cacheuta', price: 15000, duration: '5h', agency: 'Termas Mendoza', tags: ['Todos', 'Relax'] },
+      { name: 'Alta Montaña (Puente Inca)', price: 18000, duration: '8h', agency: 'Montaña Tours', tags: ['Todos', 'Paisaje'] },
+      { name: 'Cabalgata', price: 20000, duration: '4h', agency: 'Andes Ride', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Mountain Bike', price: 12000, duration: '3h', agency: 'MTB Mendoza', tags: ['Adultos', 'Deporte'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 95000, media: 70000, baja: 45000 }, duration: '1h 45min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 65000, media: 45000, baja: 28000 }, duration: '1h 45min' },
+      { type: 'Bus', carrier: 'Andesmar', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 55000, media: 42000, baja: 30000 }, duration: '14h' },
+    ],
+    localTransport: [
+      { type: 'Mendotran', description: 'Pase libre transporte público', price: 600 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 18000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 18000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 4. Salta ───────── */
+  {
+    city: 'Salta',
+    country: 'Argentina',
+    description: 'La Linda: cerros multicolores, el Tren de las Nubes, peñas folclóricas y la ruta del vino de altura.',
+    accommodations: [
+      { name: 'Hotel Alejandro I', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Kkala Boutique Hotel', category: 'Hotel', pricePerNight: { alta: 130000, media: 104000, baja: 78000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Vista a los cerros', 'Desayuno incluido'] },
+      { name: 'Hostel La Casa de Arturo', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Hotel Salta', category: 'Hotel', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Del Milagro Hotel', category: 'Hotel', pricePerNight: { alta: 43750, media: 35000, baja: 26250 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Calefacción'] },
+      { name: 'Las Wayras', category: 'Hostel', pricePerNight: { alta: 15300, media: 11700, baja: 9000 }, amenities: ['WiFi', 'Bar', 'Piscina', 'Terraza'] },
+      { name: 'Posada del Cerro', category: 'Hotel', pricePerNight: { alta: 60000, media: 48000, baja: 36000 }, amenities: ['WiFi', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Sheraton Salta', category: 'Hotel', pricePerNight: { alta: 160000, media: 128000, baja: 96000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Design Hostel Salta', category: 'Hostel', pricePerNight: { alta: 18700, media: 14300, baja: 11000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Desayuno incluido'] },
+      { name: 'Cabañas del Valle', category: 'Cabaña', pricePerNight: { alta: 52500, media: 42000, baja: 31500 }, amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Sol de Salta', category: 'Hotel', pricePerNight: { alta: 87500, media: 70000, baja: 52500 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento'] },
+      { name: 'Hotel Colonial', category: 'Hotel', pricePerNight: { alta: 42500, media: 32500, baja: 25000 }, amenities: ['WiFi', 'Desayuno incluido'] },
+    ],
+    activities: [
+      { name: 'Tren de las Nubes', price: 35000, duration: '15h', agency: 'Tren a las Nubes', tags: ['Todos', 'Paisaje'] },
+      { name: 'Tour a Cafayate', price: 18000, duration: '10h', agency: 'Salta Tours', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'Catedral de Salta', price: 3000, duration: '1h', agency: 'City Tours', tags: ['Todos', 'Cultura'] },
+      { name: 'Teleférico San Bernardo', price: 5000, duration: '1h', agency: 'Teleférico Salta', tags: ['Todos', 'Paisaje'] },
+      { name: 'Peña Folclórica', price: 8000, duration: '3h', agency: 'Salta Espectáculos', tags: ['Adultos', 'Espectáculo'] },
+      { name: 'Museo de Arqueología MAAM', price: 4000, duration: '2h', agency: 'Museos Salta', tags: ['Adultos', 'Cultura'] },
+      { name: 'Tour a Purmamarca', price: 15000, duration: '12h', agency: 'Norte Tours', tags: ['Todos', 'Paisaje'] },
+      { name: 'Cuesta del Obispo', price: 12000, duration: '6h', agency: 'Montaña Tours', tags: ['Adultos', 'Paisaje'] },
+      { name: 'Valle de Lerma', price: 8000, duration: '4h', agency: 'Salta Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Museo Güemes', price: 3000, duration: '1.5h', agency: 'Museos Salta', tags: ['Adultos', 'Cultura'] },
+      { name: 'Tour vino de altura', price: 25000, duration: '8h', agency: 'Vinos del Norte', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'San Antonio de los Cobres', price: 22000, duration: '10h', agency: 'Norte Tours', tags: ['Adultos', 'Aventura'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 110000, media: 80000, baja: 50000 }, duration: '2h 10min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 75000, media: 50000, baja: 30000 }, duration: '2h 10min' },
+      { type: 'Bus', carrier: 'Flecha Bus', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 60000, media: 45000, baja: 32000 }, duration: '18h' },
+    ],
+    localTransport: [
+      { type: 'SAETA', description: 'Boleto transporte urbano', price: 350 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 16000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 16000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 5. Córdoba ───────── */
+  {
+    city: 'Córdoba',
+    country: 'Argentina',
+    description: 'La Docta: sierras, cuarteto, historia jesuítica, Villa Carlos Paz y la mejor vida nocturna del interior.',
+    accommodations: [
+      { name: 'Sheraton Córdoba', category: 'Hotel', pricePerNight: { alta: 150000, media: 120000, baja: 90000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Windsor', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hostel Celeste', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Terraza'] },
+      { name: 'NH Córdoba Panorama', category: 'Hotel', pricePerNight: { alta: 75000, media: 60000, baja: 45000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Aire acondicionado'] },
+      { name: 'Holiday Inn Córdoba', category: 'Hotel', pricePerNight: { alta: 85000, media: 68000, baja: 51000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'La Cañada Hostel', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Hotel Dorá', category: 'Hotel', pricePerNight: { alta: 37500, media: 30000, baja: 22500 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Cabañas El Sauce', category: 'Cabaña', pricePerNight: { alta: 50000, media: 40000, baja: 30000 }, amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Quorum Hotel', category: 'Hotel', pricePerNight: { alta: 110000, media: 88000, baja: 66000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Andenes Hostel', category: 'Hostel', pricePerNight: { alta: 13600, media: 10400, baja: 8000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Desayuno incluido'] },
+      { name: 'Hotel de la Ciudad', category: 'Hotel', pricePerNight: { alta: 43750, media: 35000, baja: 26250 }, amenities: ['WiFi', 'Desayuno incluido', 'Estacionamiento'] },
+      { name: 'Mirador de las Sierras', category: 'Cabaña', pricePerNight: { alta: 55000, media: 44000, baja: 33000 }, amenities: ['WiFi', 'Piscina', 'Vista a las sierras', 'Estacionamiento', 'Aire acondicionado'] },
+    ],
+    activities: [
+      { name: 'Manzana Jesuítica', price: 5000, duration: '2h', agency: 'Córdoba Tours', tags: ['Todos', 'Cultura'] },
+      { name: 'Villa Carlos Paz', price: 8000, duration: '4h', agency: 'Sierras Tours', tags: ['Todos', 'Paseo'] },
+      { name: 'Museo Superior de Bellas Artes', price: 3000, duration: '2h', agency: 'Museos Córdoba', tags: ['Adultos', 'Cultura'] },
+      { name: 'Cerro Uritorco Trek', price: 15000, duration: '6h', agency: 'Trekking Córdoba', tags: ['Adultos', 'Trekking'] },
+      { name: 'Dique Los Molinos', price: 8000, duration: '4h', agency: 'Lagos Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Tour de la Bomba', price: 10000, duration: '2h', agency: 'Bomba Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Río Cuarto Safari', price: 12000, duration: '5h', agency: 'Safari Córdoba', tags: ['Adultos', 'Aventura'] },
+      { name: 'Parque Nacional Quebrada del Condorito', price: 5000, duration: '6h', agency: 'Parques Córdoba', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Cabalgar en las Sierras', price: 12000, duration: '4h', agency: 'Sierras Ride', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Museo Casa de la Moneda', price: 2000, duration: '1.5h', agency: 'Museos Córdoba', tags: ['Todos', 'Cultura'] },
+      { name: 'Tour Gastronómico', price: 15000, duration: '3h', agency: 'Food Tours CBA', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'Rafting en Villa General Belgrano', price: 18000, duration: '3h', agency: 'Aventura Córdoba', tags: ['Adultos', 'Aventura'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 75000, media: 55000, baja: 35000 }, duration: '1h 20min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 50000, media: 35000, baja: 22000 }, duration: '1h 20min' },
+      { type: 'Bus', carrier: 'Chevallier', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 45000, media: 35000, baja: 25000 }, duration: '10h' },
+    ],
+    localTransport: [
+      { type: 'CityBus', description: 'Boleto transporte urbano', price: 350 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 14000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 14000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 6. Iguazú ───────── */
+  {
+    city: 'Iguazú',
+    country: 'Argentina',
+    description: 'Las Cataratas del Iguazú, una de las 7 maravillas naturales del mundo. Selva misionera, fauna exótica y aventura.',
+    accommodations: [
+      { name: 'Gran Meliá Iguazú', category: 'Hotel', pricePerNight: { alta: 320000, media: 256000, baja: 192000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Vista a la selva', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hotel Saint George', category: 'Hotel', pricePerNight: { alta: 93750, media: 75000, baja: 56250 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hostel Papillón', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Piscina', 'Bar', 'Terraza'] },
+      { name: 'Iguazú Grand Hotel', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hotel Selva', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Resort Amayal', category: 'Hotel', pricePerNight: { alta: 200000, media: 160000, baja: 120000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Gimnasio', 'Restaurante', 'Vista a la selva'] },
+      { name: 'Cabañas Yasy', category: 'Cabaña', pricePerNight: { alta: 43750, media: 35000, baja: 26250 }, amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento'] },
+      { name: 'Zafarrancho Hostel', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Piscina', 'Terraza'] },
+      { name: 'Panoramic Iguazú', category: 'Hotel', pricePerNight: { alta: 75000, media: 60000, baja: 45000 }, amenities: ['WiFi', 'Piscina', 'Aire acondicionado', 'Estacionamiento', 'Desayuno incluido'] },
+      { name: 'La Sorgenda', category: 'Hotel', pricePerNight: { alta: 85000, media: 65000, baja: 50000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Aire acondicionado'] },
+      { name: 'Hotel Posada 21', category: 'Hotel', pricePerNight: { alta: 47600, media: 36400, baja: 28000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina'] },
+      { name: 'Iguazú Jungle Hostel', category: 'Hostel', pricePerNight: { alta: 13600, media: 10400, baja: 8000 }, amenities: ['WiFi', 'Piscina', 'Bar', 'Terraza', 'Actividades'] },
+    ],
+    activities: [
+      { name: 'Cataratas Lado Argentino', price: 25000, duration: '5h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Cataratas Lado Brasileño', price: 30000, duration: '4h', agency: 'Iguazú Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Paseo en Barco bajo las Cataratas', price: 35000, duration: '1h', agency: 'Aventura Iguazú', tags: ['Adultos', 'Aventura'] },
+      { name: 'Güirá Oga (Centro de Aves)', price: 8000, duration: '2h', agency: 'Güirá Oga', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Sendero Verde', price: 5000, duration: '2h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Museo de la Imagen', price: 2000, duration: '1h', agency: 'Museos Iguazú', tags: ['Todos', 'Cultura'] },
+      { name: 'Tour a las Ruinas Jesuitas', price: 10000, duration: '4h', agency: 'Historia Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Comunidad Guaraní', price: 8000, duration: '2h', agency: 'Culturas Iguazú', tags: ['Adultos', 'Cultura'] },
+      { name: 'Bici por la Selva', price: 12000, duration: '3h', agency: 'Selva Bike', tags: ['Adultos', 'Deporte'] },
+      { name: 'Rapel en Cataratas', price: 25000, duration: '2h', agency: 'Aventura Iguazú', tags: ['Adultos', 'Aventura'] },
+      { name: 'Paseo en Helicóptero', price: 60000, duration: '30min', agency: 'Helicópteros Iguazú', tags: ['Adultos', 'Aventura'] },
+      { name: 'Parque das Aves (BR)', price: 15000, duration: '2h', agency: 'Parque das Aves', tags: ['Todos', 'Naturaleza'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 130000, media: 95000, baja: 60000 }, duration: '1h 50min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 85000, media: 60000, baja: 35000 }, duration: '1h 50min' },
+      { type: 'Bus', carrier: 'Río Uruguay', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 70000, media: 55000, baja: 38000 }, duration: '18h' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Colectivo local', price: 200 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 20000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Hotel', price: 20000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 7. Ushuaia ───────── */
+  {
+    city: 'Ushuaia',
+    country: 'Argentina',
+    description: 'La ciudad más austral del mundo: glaciares, Canal Beagle, Cerro Castor y el mítico Tren del Fin del Mundo.',
+    accommodations: [
+      { name: 'Los Cauquenes Resort', category: 'Hotel', pricePerNight: { alta: 280000, media: 224000, baja: 168000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Vista al canal', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hotel Albatros', category: 'Hotel', pricePerNight: { alta: 106250, media: 85000, baja: 63750 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Vista al canal'] },
+      { name: 'Antarctica Hostel', category: 'Hostel', pricePerNight: { alta: 30600, media: 23400, baja: 18000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Desayuno incluido'] },
+      { name: 'Hotel Lennox', category: 'Hotel', pricePerNight: { alta: 120000, media: 96000, baja: 72000 }, amenities: ['WiFi', 'Desayuno incluido', 'Spa', 'Calefacción', 'Vista al mar'] },
+      { name: 'Cabañas del Beagle', category: 'Cabaña', pricePerNight: { alta: 81250, media: 65000, baja: 48750 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Vista al canal'] },
+      { name: 'Hostel Cruz del Sur', category: 'Hostel', pricePerNight: { alta: 23800, media: 18200, baja: 14000 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Bar'] },
+      { name: 'Hotel Tierra del Fuego', category: 'Hotel', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Las Hayas Resort', category: 'Hotel', pricePerNight: { alta: 190000, media: 152000, baja: 114000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Vista a la bahía', 'Restaurante'] },
+      { name: 'Posada del Fin del Mundo', category: 'Hotel', pricePerNight: { alta: 68000, media: 52000, baja: 40000 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción'] },
+      { name: 'Cabañas Alakush', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Vista al canal', 'Estacionamiento'] },
+      { name: 'Hotel Canal Beagle', category: 'Hotel', pricePerNight: { alta: 87500, media: 70000, baja: 52500 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Vista al canal'] },
+      { name: 'Yaghan Hostel', category: 'Hostel', pricePerNight: { alta: 18700, media: 14300, baja: 11000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Cocina'] },
+    ],
+    activities: [
+      { name: 'Tren del Fin del Mundo', price: 20000, duration: '1.5h', agency: 'Tren Fueguino', tags: ['Todos', 'Cultura'] },
+      { name: 'Parque Nacional Tierra del Fuego', price: 15000, duration: '5h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Navegación Canal Beagle', price: 25000, duration: '3h', agency: 'Beagle Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Cerro Castor Ski', price: 45000, duration: '6h', agency: 'Snow Fueguina', tags: ['Adultos', 'Deporte', 'Invierno'] },
+      { name: 'Museo del Fin del Mundo', price: 5000, duration: '1.5h', agency: 'Museos Ushuaia', tags: ['Todos', 'Cultura'] },
+      { name: 'Excursión a Isla Martillo (pingüinos)', price: 30000, duration: '4h', agency: 'Pingüino Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Lagos Fueguinos', price: 18000, duration: '5h', agency: 'Lagos Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Cabo de Hornos Heli', price: 55000, duration: '2h', agency: 'Helicópteros Ushuaia', tags: ['Adultos', 'Aventura'] },
+      { name: 'Paseo en 4x4', price: 22000, duration: '4h', agency: 'Ushuaia 4x4', tags: ['Adultos', 'Aventura'] },
+      { name: 'Trekking Glaciar Martial', price: 12000, duration: '4h', agency: 'Trekking Sur', tags: ['Adultos', 'Trekking'] },
+      { name: 'Museo Marítimo', price: 5000, duration: '2h', agency: 'Museos Ushuaia', tags: ['Todos', 'Cultura'] },
+      { name: 'Pesca Deportiva', price: 20000, duration: '5h', agency: 'Pesca Fueguina', tags: ['Adultos', 'Deporte'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 180000, media: 130000, baja: 85000 }, duration: '3h 30min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 120000, media: 85000, baja: 55000 }, duration: '3h 30min' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Líneas A/B', price: 300 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 22000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 22000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 8. El Calafate ───────── */
+  {
+    city: 'El Calafate',
+    country: 'Argentina',
+    description: 'Puerta de entrada al Glaciar Perito Moreno y el Parque Nacional Los Glaciares. Paisajes patagónicos imponentes.',
+    accommodations: [
+      { name: 'Los Alamos Hotel', category: 'Hotel', pricePerNight: { alta: 130000, media: 104000, baja: 78000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Spa', 'Estacionamiento', 'Calefacción'] },
+      { name: 'Hotel Mirador del Lago', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Desayuno incluido', 'Vista al lago', 'Calefacción', 'Estacionamiento'] },
+      { name: 'America del Sur Hostel', category: 'Hostel', pricePerNight: { alta: 27200, media: 20800, baja: 16000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Desayuno incluido'] },
+      { name: 'Xelena Hotel', category: 'Hotel', pricePerNight: { alta: 220000, media: 176000, baja: 132000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Gimnasio', 'Vista a la montaña', 'Restaurante'] },
+      { name: 'Hotel Kosten Aike', category: 'Hotel', pricePerNight: { alta: 75000, media: 60000, baja: 45000 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Cabañas del Glaciar', category: 'Cabaña', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Vista al lago'] },
+      { name: 'Design Suites Calafate', category: 'Hotel', pricePerNight: { alta: 150000, media: 120000, baja: 90000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Gimnasio', 'Desayuno incluido'] },
+      { name: 'Calafate Hostel', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Cocina', 'Calefacción'] },
+      { name: 'Hotel Sierra Nevada', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Posada El Ensueño', category: 'Hotel', pricePerNight: { alta: 59500, media: 45500, baja: 35000 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción'] },
+      { name: 'Cabañas del Sur', category: 'Cabaña', pricePerNight: { alta: 60000, media: 48000, baja: 36000 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Hotel Esplendor', category: 'Hotel', pricePerNight: { alta: 106250, media: 85000, baja: 63750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Calefacción'] },
+    ],
+    activities: [
+      { name: 'Glaciar Perito Moreno', price: 35000, duration: '5h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Minitrekking Glaciar', price: 55000, duration: '5h', agency: 'Glaciar Trek', tags: ['Adultos', 'Aventura'] },
+      { name: 'Navegación Glaciares Upsala', price: 45000, duration: '8h', agency: 'Glaciar Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Laguna Nimez', price: 3000, duration: '1.5h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Museo Regional', price: 4000, duration: '1.5h', agency: 'Museos Calafate', tags: ['Adultos', 'Cultura'] },
+      { name: 'Astroturismo', price: 15000, duration: '3h', agency: 'Estrellas Patagonia', tags: ['Adultos', 'Ciencia'] },
+      { name: 'Paseo en Barco Río Santa Cruz', price: 12000, duration: '3h', agency: 'Río Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Cabalgata', price: 18000, duration: '4h', agency: 'Patagonia Ride', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Bici Glaciar', price: 10000, duration: '4h', agency: 'MTB Calafate', tags: ['Adultos', 'Deporte'] },
+      { name: 'Parque Nacional los Glaciares', price: 20000, duration: '8h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Tour de la Estancia', price: 15000, duration: '5h', agency: 'Estancia Tours', tags: ['Adultos', 'Cultura'] },
+      { name: 'Observación de Fauna', price: 8000, duration: '3h', agency: 'Fauna Sur', tags: ['Todos', 'Naturaleza'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 200000, media: 145000, baja: 95000 }, duration: '3h 15min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 140000, media: 100000, baja: 65000 }, duration: '3h 15min' },
+    ],
+    localTransport: [
+      { type: 'Taxi', description: 'Tarifa urbana', price: 3000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 23000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 9. Puerto Madryn ───────── */
+  {
+    city: 'Puerto Madryn',
+    country: 'Argentina',
+    description: 'Capital del buceo argentino: ballenas, pingüinos en Punta Tombo, lobos marinos y la Península Valdés.',
+    accommodations: [
+      { name: 'Hotel Bahía Nueva', category: 'Hotel', pricePerNight: { alta: 85000, media: 68000, baja: 51000 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Dazzler Puerto Madryn', category: 'Hotel', pricePerNight: { alta: 81250, media: 65000, baja: 48750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Aire acondicionado'] },
+      { name: 'Hostel El Puerto', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Playa Hotel', category: 'Hotel', pricePerNight: { alta: 70000, media: 56000, baja: 42000 }, amenities: ['WiFi', 'Vista al mar', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Golf International', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Piscina', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Cabañas del Mar', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Aire acondicionado', 'Pet friendly'] },
+      { name: 'Hostel Patagonia', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Cocina', 'Terraza'] },
+      { name: 'Hotel Australis', category: 'Hotel', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Tolosana Hotel', category: 'Hotel', pricePerNight: { alta: 59500, media: 45500, baja: 35000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Estacionamiento'] },
+      { name: 'Hotel Gran Hotel Madryn', category: 'Hotel', pricePerNight: { alta: 68000, media: 52000, baja: 40000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Cabañas Puerto Madryn', category: 'Cabaña', pricePerNight: { alta: 52500, media: 42000, baja: 31500 }, amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Península', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Gimnasio', 'Vista al mar', 'Restaurante'] },
+    ],
+    activities: [
+      { name: 'Punta Tombo (pingüinos)', price: 18000, duration: '6h', agency: 'Fauna Madryn', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Península Valdés', price: 25000, duration: '10h', agency: 'Peninsula Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Avistaje de Ballenas', price: 30000, duration: '2h', agency: 'Ballenas Madryn', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Museo Oceánico', price: 4000, duration: '1.5h', agency: 'Museos Madryn', tags: ['Todos', 'Cultura'] },
+      { name: 'Snorkel con Lobos Marinos', price: 20000, duration: '2h', agency: 'Buceo Madryn', tags: ['Adultos', 'Aventura'] },
+      { name: 'Puerto Pirámides', price: 15000, duration: '5h', agency: 'Peninsula Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Buceo en Puerto Madryn', price: 25000, duration: '3h', agency: 'Buceo Madryn', tags: ['Adultos', 'Aventura'] },
+      { name: 'Kayak en la Bahía', price: 12000, duration: '2h', agency: 'Kayak Sur', tags: ['Adultos', 'Deporte'] },
+      { name: 'Reserva Natural San Pablo', price: 8000, duration: '3h', agency: 'Naturaleza Madryn', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Observación de Aves', price: 5000, duration: '3h', agency: 'Aves Madryn', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Isla de los Pájaros', price: 10000, duration: '3h', agency: 'Aves Madryn', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Paseo en Barco por el Golfo', price: 15000, duration: '2h', agency: 'Golfo Tours', tags: ['Todos', 'Paseo'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 140000, media: 100000, baja: 65000 }, duration: '2h' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 95000, media: 65000, baja: 40000 }, duration: '2h' },
+      { type: 'Bus', carrier: 'Mar y Valle', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 65000, media: 50000, baja: 35000 }, duration: '18h' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Colectivo urbano', price: 250 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 17000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 17000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 10. Mar del Plata ───────── */
+  {
+    city: 'Mar del Plata',
+    country: 'Argentina',
+    description: 'La Feliz: playas atlánticas, puerto pesquero, lobos marinos, casino y la mejor vida nocturna costera.',
+    accommodations: [
+      { name: 'Hotel Costa Galana', category: 'Hotel', pricePerNight: { alta: 180000, media: 144000, baja: 108000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Gimnasio', 'Vista al mar', 'Restaurante', 'Estacionamiento'] },
+      { name: 'NH Gran Hotel Provincial', category: 'Hotel', pricePerNight: { alta: 85000, media: 68000, baja: 51000 }, amenities: ['WiFi', 'Desayuno incluido', 'Vista al mar', 'Aire acondicionado'] },
+      { name: 'Hostel Estación', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Hotel Alma', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Calefacción'] },
+      { name: 'Hotel Trevijano', category: 'Hotel', pricePerNight: { alta: 59500, media: 45500, baja: 35000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Cabañas del Bosque', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Aire acondicionado', 'Pet friendly'] },
+      { name: 'Hotel Faro Norte', category: 'Hotel', pricePerNight: { alta: 47600, media: 36400, baja: 28000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Sheraton Mar del Plata', category: 'Hotel', pricePerNight: { alta: 220000, media: 176000, baja: 132000 }, amenities: ['WiFi', 'Piscina', 'Spa', 'Gimnasio', 'Vista al mar', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Hostel Nómade', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Desayuno incluido'] },
+      { name: 'Hotel Versailles', category: 'Hotel', pricePerNight: { alta: 43750, media: 35000, baja: 26250 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Estacionamiento'] },
+      { name: 'Cabañas Las Brusquitas', category: 'Cabaña', pricePerNight: { alta: 60000, media: 48000, baja: 36000 }, amenities: ['WiFi', 'Piscina', 'Estacionamiento', 'Aire acondicionado', 'Vista al mar'] },
+      { name: 'Hotel Presidente', category: 'Hotel', pricePerNight: { alta: 52500, media: 42000, baja: 31500 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado', 'Estacionamiento'] },
+    ],
+    activities: [
+      { name: 'Museo MAR', price: 2000, duration: '2h', agency: 'Museos MDP', tags: ['Todos', 'Cultura'] },
+      { name: 'Casino Central', price: 5000, duration: '3h', agency: 'Casinos MDP', tags: ['Adultos', 'Entretenimiento'] },
+      { name: 'Acuario Mar del Plata', price: 12000, duration: '2h', agency: 'Acuario MDP', tags: ['Niños', 'Naturaleza'] },
+      { name: 'Torreón del Monje', price: 3000, duration: '1h', agency: 'Torres MDP', tags: ['Todos', 'Cultura'] },
+      { name: 'Playa Bristol', price: 0, duration: '4h', agency: 'Gratuito', tags: ['Todos', 'Playa'] },
+      { name: 'Parque de los Camellos', price: 5000, duration: '2h', agency: 'Parques MDP', tags: ['Niños', 'Entretenimiento'] },
+      { name: 'Paseo en Barco por el Puerto', price: 10000, duration: '1.5h', agency: 'Puerto Tours', tags: ['Todos', 'Paseo'] },
+      { name: 'Museo de la Ciudad', price: 2000, duration: '1.5h', agency: 'Museos MDP', tags: ['Adultos', 'Cultura'] },
+      { name: 'Pesca en Escollera', price: 5000, duration: '4h', agency: 'Pesca MDP', tags: ['Adultos', 'Deporte'] },
+      { name: 'Teatro Colón MDP', price: 8000, duration: '2h', agency: 'Teatros MDP', tags: ['Adultos', 'Cultura'] },
+      { name: 'Club de Golf', price: 15000, duration: '4h', agency: 'Golf MDP', tags: ['Adultos', 'Deporte'] },
+      { name: 'Plaza del Agua', price: 1000, duration: '2h', agency: 'Parques MDP', tags: ['Todos', 'Entretenimiento'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 65000, media: 45000, baja: 30000 }, duration: '55min' },
+      { type: 'Bus', carrier: 'Plusmar', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 35000, media: 25000, baja: 18000 }, duration: '5h 30min' },
+      { type: 'Auto', carrier: 'Ruta 2 (peaje)', from: 'Buenos Aires', pricePerPerson: { alta: 20000, media: 18000, baja: 15000 }, duration: '4h' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Líneas 511/512', price: 300 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 13000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 13000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 11. Rosario ───────── */
+  {
+    city: 'Rosario',
+    country: 'Argentina',
+    description: 'Cuna de la Bandera y de Messi. Costanera sobre el Paraná, islas, gastronomía y vibrante vida cultural.',
+    accommodations: [
+      { name: 'Pullman Rosario', category: 'Hotel', pricePerNight: { alta: 130000, media: 104000, baja: 78000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Holiday Inn Rosario', category: 'Hotel', pricePerNight: { alta: 106250, media: 85000, baja: 63750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hostel Rosario Inn', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Hotel Dazzler Rosario', category: 'Hotel', pricePerNight: { alta: 81250, media: 65000, baja: 48750 }, amenities: ['WiFi', 'Desayuno incluido', 'Piscina', 'Gimnasio', 'Aire acondicionado'] },
+      { name: 'Hotel Ariston', category: 'Hotel', pricePerNight: { alta: 59500, media: 45500, baja: 35000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Cabañas del Río', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Aire acondicionado', 'Vista al río'] },
+      { name: 'Estación Rosario Hostel', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Terraza', 'Cocina'] },
+      { name: 'Hotel Plaza Real', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Ros Tower', category: 'Hotel', pricePerNight: { alta: 95000, media: 76000, baja: 57000 }, amenities: ['WiFi', 'Piscina', 'Gimnasio', 'Restaurante', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Eirado', category: 'Hotel', pricePerNight: { alta: 54400, media: 41600, baja: 32000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+      { name: 'Cabañas del Parque', category: 'Cabaña', pricePerNight: { alta: 50000, media: 40000, baja: 30000 }, amenities: ['WiFi', 'Cocina', 'Estacionamiento', 'Aire acondicionado'] },
+      { name: 'Hotel Colonial Rosario', category: 'Hotel', pricePerNight: { alta: 42500, media: 32500, baja: 25000 }, amenities: ['WiFi', 'Desayuno incluido', 'Aire acondicionado'] },
+    ],
+    activities: [
+      { name: 'Monumento a la Bandera', price: 2000, duration: '1.5h', agency: 'Monumento', tags: ['Todos', 'Cultura'] },
+      { name: 'Parque Independencia', price: 1000, duration: '2h', agency: 'Parques Rosario', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Museo de la Memoria', price: 2000, duration: '2h', agency: 'Museos Rosario', tags: ['Adultos', 'Cultura'] },
+      { name: 'Isla de los Inventos', price: 5000, duration: '2h', agency: 'Inventos Rosario', tags: ['Niños', 'Educación'] },
+      { name: 'Río Paraná Paseo en Barco', price: 8000, duration: '2h', agency: 'Río Tours', tags: ['Todos', 'Paseo'] },
+      { name: 'Bici por la Costanera', price: 2000, duration: '2h', agency: 'Bici Rosario', tags: ['Todos', 'Deporte'] },
+      { name: 'Museo Castagnino', price: 3000, duration: '2h', agency: 'Museos Rosario', tags: ['Adultos', 'Cultura'] },
+      { name: 'Tiro al Blanco', price: 10000, duration: '2h', agency: 'Deportes Rosario', tags: ['Adultos', 'Deporte'] },
+      { name: 'Gastronomía en Pichincha', price: 12000, duration: '3h', agency: 'Food Tours Ros', tags: ['Adultos', 'Gastronomía'] },
+      { name: 'Planetario de Rosario', price: 3000, duration: '1.5h', agency: 'Planetario Ros', tags: ['Niños', 'Educación'] },
+      { name: 'Estadio Gigante de Arroyito', price: 5000, duration: '2h', agency: 'Fútbol Rosario', tags: ['Adultos', 'Deporte'] },
+      { name: 'Paseo del Siglo', price: 1000, duration: '1.5h', agency: 'Paseos Rosario', tags: ['Todos', 'Paseo'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 55000, media: 40000, baja: 25000 }, duration: '50min' },
+      { type: 'Bus', carrier: 'Tienda León', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 25000, media: 18000, baja: 12000 }, duration: '4h' },
+      { type: 'Auto', carrier: 'Autopista Rosario-BA (peaje)', from: 'Buenos Aires', pricePerPerson: { alta: 15000, media: 12000, baja: 10000 }, duration: '3h 30min' },
+    ],
+    localTransport: [
+      { type: 'Colectivo', description: 'Líneas 100/200', price: 280 },
+      { type: 'Taxi', description: 'Tarifa urbana', price: 12000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 12000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+
+  /* ───────── 12. San Martín de los Andes ───────── */
+  {
+    city: 'San Martín de los Andes',
+    country: 'Argentina',
+    description: 'Villa de montaña junto al lago Lácar: Cerro Chapelco, Parque Nacional Lanín, termas y una gastronomía patagónica de primer nivel.',
+    accommodations: [
+      { name: 'Hotel Caupolicán', category: 'Hotel', pricePerNight: { alta: 110000, media: 88000, baja: 66000 }, amenities: ['WiFi', 'Desayuno incluido', 'Spa', 'Vista al lago', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Hostel Patagonia Andina', category: 'Hostel', pricePerNight: { alta: 27200, media: 20800, baja: 16000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Desayuno incluido'] },
+      { name: 'Cabañas del Chapelco', category: 'Cabaña', pricePerNight: { alta: 65000, media: 52000, baja: 39000 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Vista a la montaña'] },
+      { name: 'Hotel Parque Lacar', category: 'Hotel', pricePerNight: { alta: 93750, media: 75000, baja: 56250 }, amenities: ['WiFi', 'Desayuno incluido', 'Vista al lago', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Hostel del Bosque', category: 'Hostel', pricePerNight: { alta: 20400, media: 15600, baja: 12000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Terraza'] },
+      { name: 'Ayres del Filo', category: 'Cabaña', pricePerNight: { alta: 62500, media: 50000, baja: 37500 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Vista al lago'] },
+      { name: 'Hotel Le Lac', category: 'Hotel', pricePerNight: { alta: 56250, media: 45000, baja: 33750 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción', 'Estacionamiento'] },
+      { name: 'Cabañas del Río', category: 'Cabaña', pricePerNight: { alta: 68000, media: 52000, baja: 40000 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Pet friendly'] },
+      { name: 'Hotel Sol de los Andes', category: 'Hotel', pricePerNight: { alta: 85000, media: 68000, baja: 51000 }, amenities: ['WiFi', 'Spa', 'Piscina', 'Calefacción', 'Restaurante', 'Estacionamiento'] },
+      { name: 'Posada del Valle', category: 'Hotel', pricePerNight: { alta: 59500, media: 45500, baja: 35000 }, amenities: ['WiFi', 'Desayuno incluido', 'Calefacción'] },
+      { name: 'Cabañas del Sol', category: 'Cabaña', pricePerNight: { alta: 68750, media: 55000, baja: 41250 }, amenities: ['WiFi', 'Cocina', 'Calefacción', 'Estacionamiento', 'Vista al lago'] },
+      { name: 'Hostel Montana', category: 'Hostel', pricePerNight: { alta: 17000, media: 13000, baja: 10000 }, amenities: ['WiFi', 'Bar', 'Calefacción', 'Cocina'] },
+    ],
+    activities: [
+      { name: 'Cerro Chapelco Ski', price: 50000, duration: '6h', agency: 'Chapelco Ski', tags: ['Adultos', 'Deporte', 'Invierno'] },
+      { name: 'Paseo en Barco Lago Lacar', price: 18000, duration: '3h', agency: 'Lacar Tours', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Parque Nacional Lanín', price: 5000, duration: '6h', agency: 'Parques Nacionales', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Termas de Lahuen Co', price: 12000, duration: '4h', agency: 'Termas SMA', tags: ['Todos', 'Relax'] },
+      { name: 'Sendero Arrayanes', price: 3000, duration: '3h', agency: 'Sendero SMA', tags: ['Todos', 'Naturaleza'] },
+      { name: 'Cabalgata', price: 15000, duration: '4h', agency: 'Andes Ride', tags: ['Adultos', 'Naturaleza'] },
+      { name: 'Museo Regional', price: 3000, duration: '1.5h', agency: 'Museos SMA', tags: ['Adultos', 'Cultura'] },
+      { name: 'Pesca Deportiva', price: 15000, duration: '5h', agency: 'Pesca Sur', tags: ['Adultos', 'Deporte'] },
+      { name: 'Bici de Montaña', price: 10000, duration: '4h', agency: 'MTB Andina', tags: ['Adultos', 'Deporte'] },
+      { name: 'Rafting Río Hua Hum', price: 20000, duration: '3h', agency: 'Aventura SMA', tags: ['Adultos', 'Aventura'] },
+      { name: 'Playa Quila Quina', price: 2000, duration: '4h', agency: 'Playas SMA', tags: ['Todos', 'Playa'] },
+      { name: 'Ascenso Cerro Colorado', price: 8000, duration: '5h', agency: 'Trekking SMA', tags: ['Adultos', 'Trekking'] },
+    ],
+    transport: [
+      { type: 'Avión', carrier: 'Aerolíneas Argentinas', from: 'Buenos Aires (AEP)', pricePerPerson: { alta: 135000, media: 95000, baja: 60000 }, duration: '2h 20min' },
+      { type: 'Avión', carrier: 'FlyBondi', from: 'Buenos Aires (EZE)', pricePerPerson: { alta: 90000, media: 65000, baja: 40000 }, duration: '2h 20min' },
+      { type: 'Bus', carrier: 'Vía Bariloche', from: 'Buenos Aires (Retiro)', pricePerPerson: { alta: 70000, media: 55000, baja: 38000 }, duration: '24h' },
+    ],
+    localTransport: [
+      { type: 'Taxi', description: 'Tarifa urbana', price: 2000 },
+      { type: 'Transfer privado', description: 'Aeropuerto ↔ Centro', price: 21000 },
+    ],
+    promotions: [
+      { bank: 'Banco Galicia', description: '6 cuotas sin interés', discount: '10%' },
+      { bank: 'Banco Santander', description: '3 cuotas sin interés', discount: '15%' },
+      { bank: 'Banco Nación', description: '12 cuotas sin interés', discount: '20%' },
+      { bank: 'MercadoPago', description: 'Pago con QR', discount: '5%' },
+      { bank: 'Visa', description: '6 cuotas sin interés', discount: '8%' },
+      { bank: 'Mastercard', description: '6 cuotas sin interés', discount: '8%' },
+    ],
+  },
+];
