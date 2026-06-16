@@ -16,8 +16,25 @@ const DESTINOS = [
   'Mar del Plata', 'Rosario', 'San Martín de los Andes',
 ];
 
+function parseDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split('/');
+  if (parts.length !== 3) return null;
+  const [d, m, y] = parts.map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function getDurationDays(start: string, end: string): number {
+  const s = parseDate(start);
+  const e = parseDate(end);
+  if (!s || !e) return 0;
+  const diffTime = e.getTime() - s.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 ? diffDays + 1 : 0;
+}
+
 export default function IndexScreen() {
-  const { tripParams, setTripParams } = useTrip();
+  const { tripParams, setTripParams, setItinerary, clearPending } = useTrip();
   
   const [dest, setDest] = useState(tripParams.destination);
   const [showDestPicker, setShowDestPicker] = useState(false);
@@ -29,6 +46,9 @@ export default function IndexScreen() {
   const [childrenCount, setChildrenCount] = useState(tripParams.childrenCount.toString());
 
   const handleStart = () => {
+    clearPending();
+    setItinerary([]);
+    
     setTripParams({
       destination: dest,
       maxBudget: Number(budget) || 0,
@@ -104,7 +124,16 @@ export default function IndexScreen() {
               />
             </View>
 
-            <Text style={styles.label}>Fechas del Viaje</Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>Fechas del Viaje</Text>
+              {startDate && endDate && (
+                <View style={styles.durationBadge}>
+                  <Text style={styles.durationBadgeText}>
+                    {getDurationDays(startDate, endDate)} {getDurationDays(startDate, endDate) === 1 ? 'día' : 'días'}
+                  </Text>
+                </View>
+              )}
+            </View>
             <View style={styles.dateRow}>
               <TouchableOpacity style={[styles.inputContainer, styles.dateInput]} onPress={() => setShowCalendar('start')}>
                 <IconSymbol name="calendar" size={18} color={Theme.colors.primary} />
@@ -124,13 +153,37 @@ export default function IndexScreen() {
             <CalendarPicker
               visible={showCalendar === 'start'}
               selected={startDate}
-              onSelect={(d) => { setStartDate(d); setShowCalendar(null); }}
+              startDate={startDate}
+              endDate={endDate}
+              onSelect={(d) => {
+                setStartDate(d);
+                if (endDate) {
+                  const s = parseDate(d);
+                  const e = parseDate(endDate);
+                  if (s && e && s > e) {
+                    setEndDate('');
+                  }
+                }
+                setShowCalendar(null);
+              }}
               onClose={() => setShowCalendar(null)}
             />
             <CalendarPicker
               visible={showCalendar === 'end'}
               selected={endDate}
-              onSelect={(d) => { setEndDate(d); setShowCalendar(null); }}
+              startDate={startDate}
+              endDate={endDate}
+              onSelect={(d) => {
+                setEndDate(d);
+                if (startDate) {
+                  const s = parseDate(startDate);
+                  const e = parseDate(d);
+                  if (s && e && e < s) {
+                    setStartDate(d);
+                  }
+                }
+                setShowCalendar(null);
+              }}
               onClose={() => setShowCalendar(null)}
             />
 
@@ -189,7 +242,25 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.borderLight,
     backgroundColor: Theme.colors.surfaceLight,
   },
-  label: { fontSize: 15, color: Theme.colors.textMain, marginBottom: 8, marginTop: 16, fontWeight: '600' },
+  label: { fontSize: 15, color: Theme.colors.textMain, fontWeight: '600' },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  durationBadge: {
+    backgroundColor: Theme.colors.primary + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  durationBadgeText: {
+    color: Theme.colors.primary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
