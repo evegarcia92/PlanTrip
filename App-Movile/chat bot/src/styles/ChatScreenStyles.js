@@ -3,29 +3,47 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1a1a2e",
   },
-  messageList: {
-    flex: 1,
-    padding: 10,
+  chatList: {
+    padding: 12,
+    paddingBottom: 10,
   },
-  inputContainer: {
+  inputRow: {
     flexDirection: "row",
-    padding: 10,
+    padding: 8,
     borderTopWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#333",
+    backgroundColor: "#16213e",
   },
   input: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    backgroundColor: "#0f3460",
     borderRadius: 20,
-    paddingHorizontal: 12,
+    paddingHorizontal: 15,
+    color: "#fff",
+    fontSize: 15,
+    marginRight: 8,
   },
-  sendButton: {
-    marginLeft: 8,
-    backgroundColor: "#4a90e2",
-    padding: 12,
-    borderRadius: 20,
+  sendBtn: {
+    backgroundColor: "#e94560",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sendText: {
+    color: "#fff",
+    fontSize: 20,
+  },
+  loadingBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#16213e",
+    padding: 10,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginVertical: 5,
   },
 });

@@ -1,114 +1,106 @@
 // screens/ChatScreen.js
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   TextInput,
+  FlatList,
   TouchableOpacity,
   Text,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
+import MessageBubble from "./MessageBubble";
+import { sendMessage } from "../services/openrouter";
 import styles from "../styles/ChatScreenStyles";
-import MessageBubble from "../components/MessageBubble";
-import { fetchBotResponse } from "../services/openrouter";
 
-const ChatScreen = () => {
-  const [messages, setMessages] = useState([ { sender: "bot", text: "¡Hola! Soy tu asistente bot. ¿En qué puedo ayudarte?" }]);
+const SYSTEM_PROMPT = `Sos un asistente de viajes argentino llamado PlanTrip 🧳.
+Tu objetivo es ayudar al usuario a planificar un viaje paso a paso.
+Primero preguntá: destino, fechas, presupuesto, cantidad de acompañantes.
+Después armá un itinerario con alojamiento, actividades y transporte.
+Sé amigable, usá lenguaje informal argentino y emojis.
+Respondé siempre en español.`;
+
+export default function ChatScreen() {
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content:
+        "¡Hola! 👋 Soy PlanTrip, tu asistente de viajes.\n\n¿A dónde te gustaría viajar? Contame destino, fechas, presupuesto y cuántos van 🧳",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const scrollRef = useRef();
+  const flatListRef = useRef(null);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    const userMsg = { role: "user", content: input.trim() };
+    const updated = [...messages, userMsg];
+    setMessages(updated);
     setInput("");
     setLoading(true);
 
-    const reply = await fetchBotResponse(input);
-    setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollToEnd({ animated: true });
+    try {
+      const history = [{ role: "system", content: SYSTEM_PROMPT }, ...updated];
+      const reply = await sendMessage(history);
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "⚠️ Error al contactar al asistente." },
+      ]);
+    } finally {
+      setLoading(false);
     }
-  }, [messages, loading]);
+  };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={80}
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={90}
     >
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={{ padding: 10, paddingBottom: 20 }}
-      >
-        {messages.map((msg, index) => (
-          <MessageBubble key={index} message={msg} />
-        ))}
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        keyExtractor={(_, i) => i.toString()}
+        renderItem={({ item }) => <MessageBubble message={item} />}
+        contentContainerStyle={styles.chatList}
+        onContentSizeChange={() =>
+          flatListRef.current?.scrollToEnd({ animated: true })
+        }
+      />
 
-        {loading && (
-          <View style={[styles.loadingBubble]}>
-            <ActivityIndicator size="small" color="#555" />
-            <Text style={{ marginLeft: 5 }}>Escribiendo...</Text>
-          </View>
-        )}
-      </ScrollView>
+      {loading && (
+        <View style={styles.loadingBubble}>
+          <ActivityIndicator size="small" color="#e94560" />
+          <Text style={{ marginLeft: 8, color: "#888" }}>Escribiendo...</Text>
+        </View>
+      )}
 
-      <View style={styles.inputContainer}>
+      <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder="Escribí algo..."
           value={input}
           onChangeText={setInput}
+          placeholder="Escribí tu mensaje..."
+          placeholderTextColor="#888"
+          editable={!loading}
         />
         <TouchableOpacity
-          style={styles.sendButton}
+          style={styles.sendBtn}
           onPress={handleSend}
           disabled={loading}
         >
-          <Text style={{ color: "#fff" }}>Enviar</Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.sendText}>➤</Text>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
-};
-
-/**const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-  },
-  input: {
-    flex: 1,
-    borderColor: "#CCC",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 8,
-    marginRight: 5,
-  },
-  sendButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  loadingBubble: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#EEE",
-    padding: 10,
-    borderRadius: 10,
-    alignSelf: "flex-start",
-    marginVertical: 5,
-  },
-});**/
-
-export default ChatScreen;
+}

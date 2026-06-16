@@ -3,32 +3,36 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 const MessageBubble = ({ message }) => {
-  const isUser = message.sender === "user";
+  const isUser = message.role === "user";
 
   return (
     <View style={[styles.bubble, isUser ? styles.user : styles.bot]}>
-      <Text style={styles.text}>{message.text}</Text>
+      <Text style={styles.text}>{message.content}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   bubble: {
-    marginVertical: 5,
-    padding: 10,
-    borderRadius: 10,
+    marginVertical: 4,
+    padding: 12,
+    borderRadius: 16,
     maxWidth: "80%",
   },
   user: {
-    backgroundColor: "#DCF8C6",
+    backgroundColor: "#e94560",
     alignSelf: "flex-end",
+    borderBottomRightRadius: 4,
   },
   bot: {
-    backgroundColor: "#EEE",
+    backgroundColor: "#333",
     alignSelf: "flex-start",
+    borderBottomLeftRadius: 4,
   },
   text: {
-    fontSize: 16,
+    color: "#fff",
+    fontSize: 15,
+    lineHeight: 21,
   },
 });
 

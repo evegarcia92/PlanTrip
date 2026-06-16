@@ -1,32 +1,28 @@
 // services/openrouter.js
 import axios from "axios";
-
 import { OPENROUTER_API_KEY } from "@env";
 
-export const fetchBotResponse = async (userMessage) => {
+export async function sendMessage(messages) {
   try {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "Eres un asistente útil." },
-          { role: "user", content: userMessage },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
+        model: "deepseek/deepseek-chat-v3-0324:free",
+        messages,
       },
       {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://plantrip.app",
+          "X-Title": "PlanTrip Chatbot",
         },
       }
     );
 
-    return response.data.choices?.[0]?.message?.content || "⚠️ No se encontró contenido";
+    return response.data.choices[0].message.content;
   } catch (error) {
-    console.error("❌ Error en OpenRouter:", error.response?.data || error.message);
-    return "⚠️ Error al conectar con la API de OpenRouter.";
+    console.error("❌ Error OpenRouter:", error.response?.data || error.message);
+    throw error;
   }
-};
+}
